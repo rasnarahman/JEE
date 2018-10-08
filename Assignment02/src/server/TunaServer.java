@@ -1,4 +1,5 @@
 package server;
+import java.io.EOFException;
 /* File: TunaServer.java
  * Author: Stanley Pieda, based on course materials by Todd Kelley
  * Modified Date: Aug 2018
@@ -55,53 +56,65 @@ public class TunaServer {
 				Message messageObj;
 				Tuna tuna;
 				String messageStr = "";
-				System.out.println("Got a connection");
+				System.out.println(">>> Got a connection");
 				try {
 					SocketAddress remoteAddress = connection.getRemoteSocketAddress();
 					String remote = remoteAddress.toString();
 					output = new ObjectOutputStream (connection.getOutputStream());
-					input = new ObjectInputStream( connection.getInputStream());               
-					do {
-						messageObj = (Message) input.readObject();
-						messageStr = messageObj.getCommand();
-						tuna = messageObj.getTuna();
-						
-						System.out.println("From:" + remote + ">"+messageStr);
-						
-						if(messageStr == null || messageStr.isEmpty()) {
-							messageStr = null;
-						}
-						else {
-							
-							if (messageStr.equalsIgnoreCase("Insert")) {
-								// Insert tuna in db
-								
-								TunaDaoImpl tunaDao = new TunaDaoImpl();
-								try {
-									tunaDao.insertTuna(tuna);
-									Tuna insertedTuna = tunaDao.getTunaByUUID(tuna.getUUID());
-									
-									messageStr = "Insert_sucess returned tuna: "
-												+ insertedTuna.getId() + ", "
-												+ insertedTuna.getRecordNumber() + ", " 
-												+ insertedTuna.getOmega() + ", " 
-												+ insertedTuna.getDelta() + ", "
-												+ insertedTuna.getTheta()+ ", " 
-												+ insertedTuna.getUUID();
-									
-								} catch (SQLException e) {
-									messageStr = "Insert failed." + e.getMessage();							
-								}
+					input = new ObjectInputStream( connection.getInputStream());
+					
+					try {
+						do {
+							Object inputStreamObject = input.readObject();					
+							if(inputStreamObject == null) {
+								messageStr = null;
 							}
 							else {
-								messageStr = "Insert not requested.";
+								messageObj = (Message) inputStreamObject;
+								messageStr = messageObj.getCommand();
+								tuna = messageObj.getTuna();
+								
+								System.out.println(">>> Request From Client: " + remote + " | Command:  "+ messageStr);
+								
+								if(tuna == null 
+										|| messageStr == null 
+										|| messageStr.isEmpty()) {
+									messageStr = null;
+								}
+								else {								
+									if (messageStr.equalsIgnoreCase("Insert")) {
+										// Insert tuna in db
+										
+										TunaDaoImpl tunaDao = new TunaDaoImpl();
+										try {
+											tunaDao.insertTuna(tuna);
+											Tuna insertedTuna = tunaDao.getTunaByUUID(tuna.getUUID());
+										
+											String insertedTunaInfoInString = insertedTuna.getId() + ", "
+													+ insertedTuna.getRecordNumber() + ", " 
+													+ insertedTuna.getOmega() + ", " 
+													+ insertedTuna.getDelta() + ", "
+													+ insertedTuna.getTheta()+ ", " 
+													+ insertedTuna.getUUID();
+											messageStr = "Insert_sucess returned tuna: " + insertedTunaInfoInString; 
+											System.out.println("Insert successful. Tuna: " + insertedTunaInfoInString);
+											
+										} catch (SQLException e) {
+											messageStr = "Insert failed." + e.getMessage();							
+										}
+									}
+									else {
+										messageStr = "Insert not requested.";
+									}
+								}
+								output.writeObject(messageStr);
+								output.flush();
 							}
-
-						}
-						output.writeObject(messageStr);
-						output.flush();
-					} while (messageStr != null);
-					System.out.println(remote + " disconnected via request");
+						} while (messageStr != null);
+					}
+					catch(EOFException ex) {
+						System.out.println(">> Client: " + remote + " is disconnected via request!");
+					}					
 		        } catch (IOException exception) {
 		            System.err.println(exception.getMessage());
 		            exception.printStackTrace();

@@ -82,8 +82,15 @@ public class TunaClient {
 				Tuna tuna;			
 				Message messageObj;
 				
-				if (recordNumber == null || recordNumber.isEmpty()) {
-					recordNumber = null; // do not append host name, send null to server to start disconnect.
+				if (recordNumber == null || recordNumber.isEmpty()
+						|| omega == null || omega.isEmpty()
+						|| delta == null || delta.isEmpty()
+						|| theta == null || theta.isEmpty()) {
+					recordNumber = null; 
+					omega = null;
+					delta = null;
+					theta = null;
+					System.out.println(">>> Empty parameter provided. Client terminated!");
 				}
 				else {
 					//Create Tuna and Message object to transfer to the server.
@@ -96,7 +103,6 @@ public class TunaClient {
 					tuna.setDelta(delta);
 					tuna.setTheta(theta);
 					tuna.setUUID(uuid.toString());
-					
 					
 					messageObj = new Message("Insert", tuna);
 					
