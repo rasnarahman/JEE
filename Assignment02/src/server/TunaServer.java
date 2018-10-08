@@ -90,7 +90,7 @@ public class TunaServer {
 												+ insertedTuna.getUUID();
 									
 								} catch (SQLException e) {
-									messageStr = "Insert failed.";							
+									messageStr = "Insert failed." + e.getMessage();							
 								}
 							}
 							else {

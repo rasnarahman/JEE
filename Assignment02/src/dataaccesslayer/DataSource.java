@@ -20,8 +20,10 @@ import java.sql.SQLException;
 public class DataSource {
 	private Connection con = null;
 	private final String connectionString = "jdbc:mysql://localhost/assignment2?useSSL=false";
-	private final String username = "assignment2";
-	private final String password = "password";
+	//private final String username = "assignment2";
+	//private final String password = "password";
+	private final String username = "root";
+	private final String password = "Ottawa2018";
 
 	/**
 	 * Returns a reference to a connection object, configured to communicate with 

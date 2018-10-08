@@ -10,7 +10,7 @@ public class Message implements Serializable{
 
 	/*Rasna:   .............. */
 	
-	private long serialVersionUID;
+	private static final long serialVersionUID = 101;
 	private String command;
 	private Tuna tuna;
 	

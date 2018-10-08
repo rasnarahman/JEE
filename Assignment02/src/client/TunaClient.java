@@ -89,7 +89,6 @@ public class TunaClient {
 					//Create Tuna and Message object to transfer to the server.
 					
 					UUID uuid = UUID.randomUUID();
-					System.out.println(uuid.toString());
 					
 					tuna = new Tuna();
 					tuna.setRecordNumber(Integer.parseInt(recordNumber));
