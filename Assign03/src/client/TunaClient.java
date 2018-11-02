@@ -98,6 +98,13 @@ public class TunaClient {
 					tunaService.insert(tuna);
 					Tuna insertedTuna = tunaService.findByUUID(uuid.toString());
 					System.out.println("Returned tuna: " + insertedTuna);
+					
+					System.out.println("Do you want to insert another tuna? Yes / No");
+					String input = br.readLine();
+					if(input.equals("No") || input.equals("no")) {
+						System.out.println("The End.");
+						break;
+					}
 				}
 				
 			} while(recordNumber!=null);
